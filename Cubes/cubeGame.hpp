@@ -11,7 +11,8 @@ class CubeGame {
 		Player p1, p2;
 	public:
 
-		CubeGame() = default;
+		CubeGame() : p1(glm::vec2(-5.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f)),
+								 p2(glm::vec2( 5.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f)) {}
 		~CubeGame() = default;
 
 		void simulate(std::vector<std::unique_ptr<PacketInputs>>& inputPackets); //To be used by the server

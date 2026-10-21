@@ -10,7 +10,7 @@ class Player {
 		glm::vec3 color_;
 	public:
 		Player() = default;
-		Player(glm::vec3& pos, glm::vec3& color) : position_(pos), color_(color) {}
+		Player(const glm::vec2& pos, const glm::vec3& color) : position_(pos), color_(color) {}
 		~Player() = default;
 
 		glm::vec2 getPosition() const {return position_;}

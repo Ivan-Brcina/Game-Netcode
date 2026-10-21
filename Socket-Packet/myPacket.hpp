@@ -98,7 +98,7 @@ class PacketInputs : public Packet {
 		PacketInputs() : Packet(packetTypeEnum::INPUT_PACKET) {}
 		PacketInputs(PacketInputs&& other) = default;
 
-		PacketInputs(bool inputs[4]) : Packet(packetTypeEnum::INPUT_PACKET) {
+		PacketInputs(uint32_t id, bool inputs[4]) : Packet(packetTypeEnum::INPUT_PACKET), id_(id) {
 			for(int i = 0; i < 4; ++i) 
 				inputs_[i] = inputs[i];
 		}

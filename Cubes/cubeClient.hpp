@@ -12,6 +12,7 @@ class Client {
 		WriteStream wStream;
 		ReadStream rStream;
 
+		uint32_t playerId_;
 		CubeGame game;
 		CubeRenderer renderer;
 
@@ -21,7 +22,7 @@ class Client {
 		void sendInputs();
 
 	public:
-		Client();
+		Client(uint32_t id);
 
 		void run();
 		~Client() = default;

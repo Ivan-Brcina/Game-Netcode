@@ -1,9 +1,10 @@
 #include "cubeClient.hpp"
+#include <stdio.h>
 #include <chrono>
 
 using namespace std::chrono;
 
-Client::Client() : clientAddr(127,0,0,1,9000) {
+Client::Client(uint32_t id) : clientAddr(127,0,0,1,9000), playerId_(id) {
 	try {
 		sock.open();
 		sock.setNonBlocking(true);
@@ -22,7 +23,7 @@ void Client::sendInputs() {
 		inputs[i] = glfwGetKey(window, keys[i]) == GLFW_PRESS;
 	}
 
-	PacketInputs inputPacket{inputs};
+	PacketInputs inputPacket{playerId_, inputs};
 	inputPacket.serializeData(wStream);
 
 	try {
@@ -81,4 +82,20 @@ void Client::run() {
 		}
 }
 
+int main(int argc, char** argv) {
+	if(argc != 2) {
+		printf("Usage: %s [number] where number = 1 or 2.", argv[0]);
+		return 0;
+	}
 
+	if(*argv[1] != '1' && *argv[1] != '2') {
+		printf("Invalid argument: Should be 1 or 2");
+		return 0;
+	}
+
+	uint32_t num = *argv[1] - '0';
+
+	Client client{num};
+
+
+}
