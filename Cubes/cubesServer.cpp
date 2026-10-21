@@ -1,5 +1,5 @@
 #include "cubesServer.hpp"
-#include "../Socket-Packet/mySerialization.hpp"
+// #include "../Socket-Packet/mySerialization.hpp"
 #include "../Socket-Packet/myPacket.hpp"
 #include <chrono>
 #include <system_error>
@@ -31,7 +31,9 @@ Server::Server() : serverAddr(127,0,0,1,9000) {
 //feels slower, but I have no idea if it's even close to a significant slowdown.
 //
 
-void Server::readInputs() {
+//Returns false if there was nothing to read for the entire time the function is running. True otherwise
+bool Server::readInputs() {
+	bool filled = false;
 	uint32_t packetType;
 	inputPackets.clear();
 
@@ -45,10 +47,12 @@ void Server::readInputs() {
 			break;
 		}
 
+		filled = true;
 		PacketInputs packet{};
 		packet.serializeData(rStream);
 		this->inputPackets.push_back(std::make_unique<PacketInputs>(std::move(packet))); //No idea if this works
 	}
+	return filled;
 }
 
 //Takes the player states, packs them into a snapshot packet and sends that to loopback again
@@ -78,6 +82,8 @@ void Server::sendSnapshot() {
 //the server finished the whole work during one tick time interval. Of course thought 
 //out in more detail
 
+//Should I send snapshots only when the game state changes or literally always?
+//For now it'll be always
 void Server::run() {
     time_point<steady_clock> start = steady_clock::now();
 		auto dt = microseconds(16667); // 60fps
@@ -87,8 +93,10 @@ void Server::run() {
 		while(loop) {
 			time_point<steady_clock> currentTime = steady_clock::now();
 			while(currentTime >= accumulator) {
-				readInputs();
-				game.simulate(this->inputPackets);
+
+				if (readInputs())
+					game.simulate(this->inputPackets);
+
 				sendSnapshot();
 				accumulator += dt;
 			}

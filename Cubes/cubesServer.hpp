@@ -11,6 +11,7 @@
 //Might later think about how to make Server to be a reusable library utility with 
 //the options to overload functions like simulate(), while read() and write() and so on
 //remain the same or something.
+
 class Server {
 	private:
 		Address serverAddr;
@@ -23,7 +24,7 @@ class Server {
 
 		CubeGame game; //Change this to change the game logic handling
 
-		void readInputs();
+		bool readInputs();
 		void sendSnapshot();
 
 	public:
