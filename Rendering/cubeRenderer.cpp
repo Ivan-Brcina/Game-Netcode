@@ -2,6 +2,7 @@
 
 CubeRenderer::CubeRenderer() {
 	window_ = openGLinit();
+	
 }
 
 GLFWwindow* CubeRenderer::openGLinit() {
@@ -38,4 +39,11 @@ GLFWwindow* CubeRenderer::openGLinit() {
 
 void CubeRenderer::pollEvents() {
 	glfwPollEvents();
+}
+
+//Should be the one to call glfwSwapBuffers()
+void CubeRenderer::render(const CubeGame& game) {
+
+
+	glfwSwapBuffers(window_);
 }

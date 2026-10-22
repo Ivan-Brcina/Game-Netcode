@@ -6,6 +6,7 @@
 class CubeRenderer {
 	private:
 		GLFWwindow* window_;
+		GLuint planeVAO_, planeVBO_, cubeVAO_, cubeVBO_;
 
 		GLFWwindow* openGLinit();
 	public:
@@ -13,5 +14,4 @@ class CubeRenderer {
 		void pollEvents();
 		GLFWwindow* getWindow();
 		void render(const CubeGame& game);
-
 };

@@ -67,6 +67,7 @@ void Client::run() {
 			previous = current;
 
 			renderer.pollEvents();
+			if(glfwGetKey(renderer.getWindow(), GLFW_KEY_ESCAPE) == GLFW_PRESS) loop = false;
 
 			while(accumulator >= dt) {
 
@@ -96,5 +97,6 @@ int main(int argc, char** argv) {
 	uint32_t num = *argv[1] - '0';
 
 	Client client{num};
+	client.run();
 
 }
