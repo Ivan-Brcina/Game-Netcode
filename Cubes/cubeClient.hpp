@@ -1,7 +1,7 @@
 #pragma once
 #include "../Socket-Packet/mySocket.hpp"
 #include "cubeGame.hpp"
-#include "cubeRenderer.hpp"
+#include "../Rendering/cubeRenderer.hpp"
 
 class Client {
 	private:

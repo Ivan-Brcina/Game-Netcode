@@ -1,13 +1,15 @@
 #pragma once
+#include <glad/gl.h>
 #include <GLFW/glfw3.h>
-#include "cubeGame.hpp"
+#include "../Cubes/cubeGame.hpp"
 
 class CubeRenderer {
 	private:
-		GLuint window_;
+		GLFWwindow* window_;
 
-		void openGLinit();
+		GLFWwindow* openGLinit();
 	public:
+		CubeRenderer();
 		void pollEvents();
 		GLFWwindow* getWindow();
 		void render(const CubeGame& game);
