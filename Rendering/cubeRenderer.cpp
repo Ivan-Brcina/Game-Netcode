@@ -2,7 +2,8 @@
 
 CubeRenderer::CubeRenderer() {
 	window_ = openGLinit();
-	
+	meshGenerator_.createCube(cubeVAO_, cubeVBO_);
+	meshGenerator_.createPlane(planeVAO_, planeVBO_);
 }
 
 GLFWwindow* CubeRenderer::openGLinit() {
