@@ -2,8 +2,18 @@
 
 CubeRenderer::CubeRenderer() {
 	window_ = openGLinit();
+  shader_ = std::make_unique<Shader>(
+      "shader.vert",
+      "shader.frag");
 	meshGenerator_.createCube(cubeVAO_, cubeVBO_);
 	meshGenerator_.createPlane(planeVAO_, planeVBO_);
+}
+
+CubeRenderer::~CubeRenderer() {
+	glDeleteBuffers(1, &planeVAO_);
+	glDeleteBuffers(1, &planeVBO_);
+	glDeleteBuffers(1, &cubeVAO_);
+	glDeleteBuffers(1, &cubeVBO_);
 }
 
 GLFWwindow* CubeRenderer::openGLinit() {
