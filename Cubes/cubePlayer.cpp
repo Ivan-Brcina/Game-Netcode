@@ -17,3 +17,7 @@ void Player::updatePosition(std::vector<bool>& inputs) {
 	if(inputs[3])
 		position_ += glm::vec2(deltaS,0.0f);
 }
+
+void Player::setPosition(const glm::vec2& newPosition) {
+	this->position_ = newPosition;
+}

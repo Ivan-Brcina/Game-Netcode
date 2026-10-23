@@ -14,6 +14,7 @@ class Player {
 		~Player() = default;
 
 		glm::vec2 getPosition() const {return position_;}
+		void setPosition(const glm::vec2& newPosition);
 		glm::vec2 getColor() const {return color_;}
 		void updatePosition(std::vector<bool>& inputs);
 };

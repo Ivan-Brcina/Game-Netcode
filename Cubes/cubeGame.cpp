@@ -14,6 +14,11 @@ void CubeGame::simulate(std::vector<std::unique_ptr<PacketInputs>>& inputPackets
 	}
 }
 
+void CubeGame::applySnapshot(const PacketSnapshot& snapshot) {
+	p1.setPosition(snapshot.getPositions().at(0));
+	p2.setPosition(snapshot.getPositions().at(1));
+}
+
 std::vector<glm::vec2> CubeGame::getPositions() {
 	return std::vector<glm::vec2>{p1.getPosition(),p2.getPosition()};
 }

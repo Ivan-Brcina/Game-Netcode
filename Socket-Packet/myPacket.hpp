@@ -129,6 +129,8 @@ class PacketSnapshot : public Packet {
 	public:
 		PacketSnapshot() : Packet() {}
 		PacketSnapshot(std::vector<glm::vec2> positions) : Packet(packetTypeEnum::SNAP_PACKET), positions_(positions) {}
+
+		const std::vector<glm::vec2>& getPositions() const {return positions_;}
 		
 		template<typename Stream> void serializeData(Stream& stream) {
 

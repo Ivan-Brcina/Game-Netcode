@@ -16,7 +16,7 @@ class CubeGame {
 		~CubeGame() = default;
 
 		void simulate(std::vector<std::unique_ptr<PacketInputs>>& inputPackets); //To be used by the server
-		void update(PacketSnapshot& snapshot); //To be later used for client-side prediction
+		void applySnapshot(const PacketSnapshot& snapshot);
 
 		//Should this be copied or can it be any other way?
 		std::vector<glm::vec2> getPositions();

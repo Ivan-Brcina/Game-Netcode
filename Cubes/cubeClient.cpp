@@ -47,8 +47,10 @@ bool Client::receiveSnapshot() {
 			break;
 		}
 		filled = true;
-		PacketSnapshot snapshot{};
-		snapshot.serializeData(rStream); //Will these get destroyed and when
+		// PacketSnapshot snapshot{};
+		// snapshot.serializeData(rStream); //Will these get destroyed and when
+		// this->snapshot = std::move(snapshot); //????
+		this->snapshot.serializeData(rStream);
 	}
 	return filled;
 }
@@ -72,7 +74,7 @@ void Client::run() {
 			while(accumulator >= dt) {
 
 				if(receiveSnapshot()) {
-					game.update(this->snapshot);
+					this->game.applySnapshot(this->snapshot);
 				}
 																		 
 				sendInputs();
@@ -84,6 +86,7 @@ void Client::run() {
 }
 
 int main(int argc, char** argv) {
+
 	if(argc != 2) {
 		printf("Usage: %s [number] where number = 1 or 2.", argv[0]);
 		return 0;
