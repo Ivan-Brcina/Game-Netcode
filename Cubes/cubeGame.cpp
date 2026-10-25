@@ -1,12 +1,14 @@
 #include "cubeGame.hpp"
+#include <iostream>
 
 void CubeGame::simulate(std::vector<std::unique_ptr<PacketInputs>>& inputPackets) {
+
 	for(std::unique_ptr<PacketInputs>& packet : inputPackets) {
 		std::vector<bool> inputs = packet->getInputs();
 		switch(packet->getId()) {
-			case 0:
-				p1.updatePosition(inputs);
 			case 1:
+				p1.updatePosition(inputs);
+			case 2:
 				p2.updatePosition(inputs);
 			default:
 				std::cout << "The server is reading an invalid player id during simulation\n";

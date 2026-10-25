@@ -10,11 +10,55 @@ using namespace std::chrono;
 Server::Server() : serverAddr(127,0,0,1,9000) {
 	try {
 		sock.open();
-		sock.setNonBlocking(true);
 		sock.bind(serverAddr);
 	} catch (std::system_error e) {
 		std::cerr<<e.what()<<std::endl;
 	}
+
+	connect();
+}
+
+//Waits for both players, expects two PacketHellos, writes down who they came from, stores them in a std::unordered_map,
+//sends back the helloPacket with each players id attached, telling them to start running. Then starts run{)-ning()
+//The unordered_map starts indexing from 1.
+void Server::connect() {
+	Address clientAddr;
+
+	//Handles the two players who MUST connect
+	for(int i = 0; i < 2;) {
+		PacketHello helloPacket;
+		try {
+
+			sock.receive(&clientAddr, rStream.getBuffer());
+			helloPacket.serializeData(rStream);
+			if(helloPacket.getId() == uint32_t{0})
+				clientAddrs.emplace(++i,clientAddr);
+			else throw std::runtime_error("Server received a non 0 id on connect()\n");
+
+		} catch(std::system_error e) {
+			std::cerr<<e.what()<<std::endl;
+		} catch(std::runtime_error e) {
+			std::cerr<<e.what()<<std::endl;
+		}
+	}
+
+	//Broadcasts the IDs back to all the connected players
+	for(auto& client : clientAddrs) {
+		PacketHello startRunningPacket(client.first);
+		startRunningPacket.serializeData(wStream);
+
+		try {
+			sock.send(&client.second, wStream.getBuffer());
+		} catch(std::system_error e) {
+			std::cerr << e.what() << std::endl;
+		} catch(std::runtime_error e) {
+			std::cerr << e.what() << std::endl;
+		}
+
+	}
+
+	sock.setNonBlocking(true);
+	std::cout << "Server running...\n";
 }
 
 //I need to have a loop here to utilize the entire tick time window for everything there is
@@ -34,13 +78,12 @@ Server::Server() : serverAddr(127,0,0,1,9000) {
 //Returns false if there was nothing to read for the entire time the function is running. True otherwise
 bool Server::readInputs() {
 	bool filled = false;
-	uint32_t packetType;
 	inputPackets.clear();
 
 	while(true) { 
 
 		try {
-			sock.receive(clientAddr, rStream.getBuffer());
+			sock.receive(nullptr, rStream.getBuffer());
 		} catch(std::system_error e) {
 			std::cerr<<e.what()<<std::endl;
 		} catch (bool wouldBlock) { //If there is nothing else to read, break
@@ -55,20 +98,24 @@ bool Server::readInputs() {
 	return filled;
 }
 
-//Takes the player states, packs them into a snapshot packet and sends that to loopback again
+//Takes the player states, packs them into a snapshot packet and sends that to loopback again.
+//Here I don't like how the data is serialized again for each player, but currently I have no idea
+//how to neatly avoid that case.
+
 void Server::sendSnapshot() {
 
 	PacketSnapshot snapshot{game.getPositions()};
-	snapshot.serializeData(wStream);
 
-	try {
-		sock.send(clientAddr, wStream.getBuffer());
-	} catch(std::system_error e) {
-		std::cerr << e.what() << std::endl;
-	} catch(std::runtime_error e) {
-		std::cerr << e.what() << std::endl;
+	for(auto& client : clientAddrs) {
+		snapshot.serializeData(wStream);
+		try {
+			sock.send(&client.second, wStream.getBuffer());
+		} catch(std::system_error e) {
+			std::cerr << e.what() << std::endl;
+		} catch(std::runtime_error e) {
+			std::cerr << e.what() << std::endl;
+		}
 	}
-
 }
 
 //This code makes sure the actual working loop happen 60 times a second.
@@ -101,4 +148,10 @@ void Server::run() {
 				accumulator += dt;
 			}
 		}
+}
+
+int main() {
+	
+	Server server{};
+	server.run();
 }

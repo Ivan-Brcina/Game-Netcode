@@ -4,6 +4,7 @@
 #include "cubeGame.hpp"
 
 #include <memory>
+#include <unordered_map>
 
 //Currently both serverAddr and clientAddr are loopback addresses on the same port.
 //
@@ -15,7 +16,7 @@
 class Server {
 	private:
 		Address serverAddr;
-		Address clientAddr;
+		std::unordered_map<uint32_t, Address> clientAddrs;
 		Socket sock;
 
 		WriteStream wStream;
@@ -24,6 +25,7 @@ class Server {
 
 		CubeGame game; //Change this to change the game logic handling
 
+		void connect();
 		bool readInputs();
 		void sendSnapshot();
 

@@ -18,13 +18,12 @@ class Client {
 
 		PacketSnapshot snapshot;
 
+		void connect();
 		bool receiveSnapshot();
 		void sendInputs();
-
 	public:
 		Client();
+		~Client() = default;
 
 		void run();
-		void connect();
-		~Client() = default;
 };

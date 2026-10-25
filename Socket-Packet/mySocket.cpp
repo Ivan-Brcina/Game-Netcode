@@ -55,7 +55,7 @@ void Socket::setNonBlocking(bool nonBlock) {
 
 void Socket::close() {::close(fd_);}
 
-void Socket::send(Address& destination_addr,
+void Socket::send(Address* destination_addr,
 									Buffer& buffer) 
 {
 
@@ -63,7 +63,7 @@ void Socket::send(Address& destination_addr,
 											 buffer.getData(),
 											 buffer.getSize(),
 											 0,
-											 (struct sockaddr*)destination_addr.getAddress(),
+											 (struct sockaddr*)destination_addr->getAddress(),
 											 sizeof(sockaddr_in)
 											 );
 
@@ -80,7 +80,7 @@ void Socket::send(Address& destination_addr,
 }
 
 //This is missing a receivedBytes == 0 for a graceful close.
-void Socket::receive(Address& source_addr,
+void Socket::receive(Address* source_addr,
 								 Buffer& buffer) {
 
 	if(buffer.index_ > 0) {
@@ -107,6 +107,8 @@ void Socket::receive(Address& source_addr,
 			throw std::system_error();
 	}
 
-	source_addr.setAddress(sourceAddr);
+	if(source_addr != nullptr) {
+		source_addr->setAddress(sourceAddr);
+	}
 
 }

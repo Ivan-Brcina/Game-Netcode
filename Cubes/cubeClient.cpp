@@ -16,6 +16,7 @@ Client::Client() : clientAddr(127,0,0,1,0), serverAddr(127,0,0,1,9000) {
 		std::cerr<<e.what()<<std::endl;
 	}
 
+	connect();
 }
 
 void Client::connect() {
@@ -23,7 +24,7 @@ void Client::connect() {
 	helloPacket.serializeData(wStream);
 
 	try {
-		sock.send(serverAddr, wStream.getBuffer());
+		sock.send(&serverAddr, wStream.getBuffer());
 	} catch(std::system_error e) {
 		std::cerr << e.what() << std::endl;
 	} catch(std::runtime_error e) {
@@ -36,7 +37,7 @@ void Client::connect() {
 	Address senderAddr{};
 
 	try {
-		sock.receive(senderAddr, rStream.getBuffer());
+		sock.receive(&senderAddr, rStream.getBuffer());
 		if(senderAddr != serverAddr)
 			throw std::runtime_error("Client received a packet from the wrong address");
 	} catch(std::system_error e) {
@@ -46,6 +47,7 @@ void Client::connect() {
 	helloPacket.serializeData(rStream);
 	playerId_ = helloPacket.getId();
 	sock.setNonBlocking(true);
+	std::cout << "Game can begin" << std::endl;
 }
 
 void Client::sendInputs() {
@@ -61,7 +63,7 @@ void Client::sendInputs() {
 	inputPacket.serializeData(wStream);
 
 	try {
-		sock.send(serverAddr, wStream.getBuffer());
+		sock.send(&serverAddr, wStream.getBuffer());
 	} catch(std::system_error e) {
 		std::cerr << e.what() << std::endl;
 	} catch(std::runtime_error e) {
@@ -74,16 +76,13 @@ bool Client::receiveSnapshot() {
 
 	while(true) {
 		try {
-			sock.receive(serverAddr, rStream.getBuffer());
+			sock.receive(nullptr, rStream.getBuffer());
 		} catch(std::system_error e) {
 			std::cerr<<e.what()<<std::endl;
 		} catch (bool wouldBlock) { //If there is nothing else to read, break
 			break;
 		}
 		filled = true;
-		// PacketSnapshot snapshot{};
-		// snapshot.serializeData(rStream); //Will these get destroyed and when
-		// this->snapshot = std::move(snapshot); //????
 		this->snapshot.serializeData(rStream);
 	}
 	return filled;
@@ -122,7 +121,6 @@ void Client::run() {
 int main(int argc, char** argv) {
 
 	Client client{};
-	client.connect();
 	client.run();
 
 }

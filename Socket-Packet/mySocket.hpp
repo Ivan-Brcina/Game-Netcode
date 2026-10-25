@@ -69,15 +69,14 @@ class Socket {
 		void close();
 
 		//The idea is to use this as socket.send(address, stream.getBuffer(), size);
-		//where stream is of type WriteStream
-		
-		void send(Address& destination_addr,
+		//where stream is of type WriteStream. 
+		void send(Address* destination_addr,
 							Buffer& buffer);
 
 		//The idea is to use this as socket.send(address, stream.getBuffer(), size);
 		//where stream is of type ReadStream
-		
-		void receive(Address& source_addr,
+		//If the pointer is nullptr, it won't read into any address
+		void receive(Address* source_addr,
 								 Buffer& buffer);
 
 };
