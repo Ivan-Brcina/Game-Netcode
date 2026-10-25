@@ -78,6 +78,7 @@ void Socket::send(Address& destination_addr,
 	buffer.reset();
 
 }
+
 //This is missing a receivedBytes == 0 for a graceful close.
 void Socket::receive(Address& source_addr,
 								 Buffer& buffer) {
@@ -105,6 +106,8 @@ void Socket::receive(Address& source_addr,
 		else
 			throw std::system_error();
 	}
+
+	source_addr.setAddress(sourceAddr);
 
 	buffer.reset();
 

@@ -1,17 +1,51 @@
 #include "cubeClient.hpp"
 #include <stdio.h>
 #include <chrono>
+#include <iostream>
 
 using namespace std::chrono;
 
-Client::Client(uint32_t id) : clientAddr(127,0,0,1,9000), playerId_(id) {
+//Setting the port to 0 will 
+//choose a random free port while keeping
+//the desired ip address.
+Client::Client() : clientAddr(127,0,0,1,0), serverAddr(127,0,0,1,9000) { 
 	try {
 		sock.open();
-		sock.setNonBlocking(true);
 		sock.bind(clientAddr);
 	} catch (std::system_error e) {
 		std::cerr<<e.what()<<std::endl;
 	}
+
+}
+
+void Client::connect() {
+	PacketHello helloPacket{};
+	helloPacket.serializeData(wStream);
+
+	try {
+		sock.send(serverAddr, wStream.getBuffer());
+	} catch(std::system_error e) {
+		std::cerr << e.what() << std::endl;
+	} catch(std::runtime_error e) {
+		std::cerr << e.what() << std::endl;
+	}
+
+	std::cout << "Sent connection request\n";
+	std::cout << "Waiting for the start message\n";
+
+	Address senderAddr{};
+
+	try {
+		sock.receive(senderAddr, rStream.getBuffer());
+		if(senderAddr != serverAddr)
+			throw std::runtime_error("Client received a packet from the wrong address");
+	} catch(std::system_error e) {
+		std::cerr<<e.what()<<std::endl;
+	} 
+
+	helloPacket.serializeData(rStream);
+	playerId_ = helloPacket.getId();
+	sock.setNonBlocking(true);
 }
 
 void Client::sendInputs() {
@@ -27,7 +61,7 @@ void Client::sendInputs() {
 	inputPacket.serializeData(wStream);
 
 	try {
-		sock.send(clientAddr, wStream.getBuffer());
+		sock.send(serverAddr, wStream.getBuffer());
 	} catch(std::system_error e) {
 		std::cerr << e.what() << std::endl;
 	} catch(std::runtime_error e) {
@@ -87,19 +121,8 @@ void Client::run() {
 
 int main(int argc, char** argv) {
 
-	if(argc != 2) {
-		printf("Usage: %s [number] where number = 1 or 2.", argv[0]);
-		return 0;
-	}
-
-	if(*argv[1] != '1' && *argv[1] != '2') {
-		printf("Invalid argument: Should be 1 or 2");
-		return 0;
-	}
-
-	uint32_t num = *argv[1] - '0';
-
-	Client client{num};
+	Client client{};
+	client.connect();
 	client.run();
 
 }

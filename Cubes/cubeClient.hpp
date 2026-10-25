@@ -22,8 +22,9 @@ class Client {
 		void sendInputs();
 
 	public:
-		Client(uint32_t id);
+		Client();
 
 		void run();
+		void connect();
 		~Client() = default;
 };

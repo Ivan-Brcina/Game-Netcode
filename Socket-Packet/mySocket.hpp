@@ -22,6 +22,16 @@ class Address {
 						unsigned short port);
 
 		Address(unsigned int address, unsigned short port);
+
+		bool operator==(const Address& other) {
+			if((address_.sin_addr.s_addr == other.address_.sin_addr.s_addr) &&
+				(address_.sin_port == other.address_.sin_port))
+				return true;
+			return false;
+		}
+
+		bool operator!=(const Address& other) {return !(*this == other);}
+
 		~Address() = default;
 
 		int getA() const; 

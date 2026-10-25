@@ -1,14 +1,14 @@
 #pragma once
 #include <glm/glm.hpp>
 #include <stdexcept>
-#include <iostream>
 #include "mySerialization.hpp"
 
 enum packetTypeEnum {
 	POSITION_PACKET,
 	STATUS_PACKET,
 	INPUT_PACKET,
-	SNAP_PACKET
+	SNAP_PACKET,
+	HELLO_PACKET
 };
 
 // serialize_data in these cases means that these methods will either fill out the Packet class
@@ -89,13 +89,14 @@ bool isValidPacket(uint32_t packetType);
 
 //This is going to be specialized to just handle four directional movement for the 
 //sake of simplicity. Will definitely be changed later as more inputs get handled
+//Used to send the input state of the given network frame from the client to the server.
 
 class PacketInputs : public Packet {
 	private:
 		uint32_t id_;
 		bool inputs_[4];
 	public:
-		PacketInputs() : Packet(packetTypeEnum::INPUT_PACKET) {}
+		PacketInputs() : Packet() {}
 		PacketInputs(PacketInputs&& other) = default;
 
 		PacketInputs(uint32_t id, bool inputs[4]) : Packet(packetTypeEnum::INPUT_PACKET), id_(id) {
@@ -122,6 +123,7 @@ class PacketInputs : public Packet {
 		}
 };
 
+//Used to package the game state and broadcast it to all the clients.
 class PacketSnapshot : public Packet {
 	private:
 		std::vector<glm::vec2> positions_;
@@ -145,3 +147,33 @@ class PacketSnapshot : public Packet {
 			}
 		}
 };
+
+
+//Unlike all the other packets. This one is designed to be sent empty by the client.
+//Meant to be used at the moment the connection is established. The client 
+//introduces itself to the server through this packet.
+//Once the client received this packet from the server with its playerId assigned to it,
+//it may start run()-ning. 
+class PacketHello : public Packet {
+	private:
+		uint32_t id_;
+	public: 
+
+		PacketHello() : Packet(), id_(0) {}
+		PacketHello(uint32_t id) : Packet(packetTypeEnum::HELLO_PACKET), id_(id) {}
+
+		uint32_t getId() const {return id_;}
+
+		template<typename Stream> void serializeData(Stream& stream) {
+
+			serializeInt32(stream, this->packetType_);
+
+			if(Stream::isReading && (this->packetType_ == packetTypeEnum::HELLO_PACKET)) {
+				throw std::invalid_argument("Not a correct type of packet");
+			}
+			
+			serialieInt32(stream, id_);
+		}
+};
+
+
