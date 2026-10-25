@@ -83,7 +83,7 @@ void CubeRenderer::drawCubes(const CubeGame& game) {
 
 	for(int i = 0; i < 2; i++) {
 		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(cubePositions[i].x, 0.0f, cubePositions[i].y));
+		model = glm::translate(model, glm::vec3(cubePositions[i].x, 0.25f, cubePositions[i].y));
 		shader_->setUniformVec3("color", cubeColors[i]);
 		shader_->setUniformMat4("model", model);
 		glBindVertexArray(cubeVAO_);
