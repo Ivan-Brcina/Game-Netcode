@@ -120,6 +120,9 @@ class PacketInputs : public Packet {
 			for(int i = 0; i < 4; ++i) {
 				serializeBool(stream, inputs_[i]); 
 			}
+
+			if(Stream::isReading)
+				stream.getBuffer().reset();
 		}
 };
 
@@ -145,6 +148,9 @@ class PacketSnapshot : public Packet {
 			for(const auto& position : positions_) {
 				serializeVec2(stream, position);
 			}
+
+			if(Stream::isReading)
+				stream.getBuffer().reset();
 		}
 };
 
@@ -172,7 +178,10 @@ class PacketHello : public Packet {
 				throw std::invalid_argument("Not a correct type of packet");
 			}
 			
-			serialieInt32(stream, id_);
+			serializeInt32(stream, id_);
+
+			if(Stream::isReading)
+				stream.getBuffer().reset();
 		}
 };
 

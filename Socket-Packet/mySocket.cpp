@@ -109,6 +109,4 @@ void Socket::receive(Address& source_addr,
 
 	source_addr.setAddress(sourceAddr);
 
-	buffer.reset();
-
 }
