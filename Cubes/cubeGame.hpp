@@ -19,5 +19,6 @@ class CubeGame {
 		void applySnapshot(const PacketSnapshot& snapshot);
 
 		//Should this be copied or can it be any other way?
-		std::vector<glm::vec2> getPositions();
+		std::vector<glm::vec2> getPositions() const;
+		std::vector<glm::vec3> getColors() const;
 };

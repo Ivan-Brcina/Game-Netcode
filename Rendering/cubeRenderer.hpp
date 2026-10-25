@@ -11,8 +11,11 @@ class CubeRenderer {
 		Mesh meshGenerator_;
 		GLuint planeVAO_, planeVBO_, cubeVAO_, cubeVBO_;
 		std::unique_ptr<Shader> shader_;
+		glm::mat4 view, projection;
 
 		GLFWwindow* openGLinit();
+		void drawFloor();
+		void drawCubes(const CubeGame& game);
 	public:
 		CubeRenderer();
 		~CubeRenderer();

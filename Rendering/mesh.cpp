@@ -48,15 +48,16 @@ const std::vector<float> cubeVertices = {
 	-0.5, 0.5,-0.5, 0.0,1.0
 };
 
+
 const std::vector<float> planeVertices {
 	 // positions				 // texCoords
-	-1.0f,  1.0f, 0.0f,  0.0f, 1.0f,
-	-1.0f, -1.0f, 0.0f,  0.0f, 0.0f,
-	 1.0f, -1.0f, 0.0f,  1.0f, 0.0f,
+	-1.0f,  0.0f, -1.0f,   0.0f, 1.0f,
+	 1.0f,  0.0f,  1.0f,   1.0f, 0.0f,
+	-1.0f,  0.0f,  1.0f,   0.0f, 0.0f,
 
-	-1.0f,  1.0f,  0.0f, 1.0f,
-	 1.0f, -1.0f,  1.0f, 0.0f,
-	 1.0f,  1.0f,  1.0f, 1.0f
+	-1.0f,  0.0f, -1.0f,   0.0f, 1.0f,
+	 1.0f,  0.0f, -1.0f,	 1.0f, 1.0f,
+	 1.0f,  0.0f,  1.0f,   1.0f, 0.0f
 };
 
 
