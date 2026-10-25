@@ -3,6 +3,8 @@
 #include <stdexcept>
 #include "mySerialization.hpp"
 
+#include <iostream> //debugging
+
 enum packetTypeEnum {
 	POSITION_PACKET,
 	STATUS_PACKET,
@@ -96,7 +98,7 @@ class PacketInputs : public Packet {
 		uint32_t id_;
 		bool inputs_[4];
 	public:
-		PacketInputs() : Packet() {}
+		PacketInputs() : Packet(packetTypeEnum::INPUT_PACKET) {}
 		PacketInputs(PacketInputs&& other) = default;
 
 		PacketInputs(uint32_t id, bool inputs[4]) : Packet(packetTypeEnum::INPUT_PACKET), id_(id) {
@@ -113,8 +115,9 @@ class PacketInputs : public Packet {
 
 			serializeInt32(stream, this->packetType_);
 
-			if(Stream::isReading && !(this->packetType_ == packetTypeEnum::INPUT_PACKET)) {
-				throw std::invalid_argument("Not a correct type of packet");
+			if(Stream::isReading && (this->packetType_ != packetTypeEnum::INPUT_PACKET)) {
+				std::cout << "Server read this type : " << this->packetType_ << ", expected 2\n";
+				throw std::invalid_argument("Not a correct type of packet (Input)");
 			}
 			serializeInt32(stream, id_);
 			for(int i = 0; i < 4; ++i) {
@@ -132,7 +135,7 @@ class PacketSnapshot : public Packet {
 		std::vector<glm::vec2> positions_;
 
 	public:
-		PacketSnapshot() : Packet() {}
+		PacketSnapshot() : Packet(packetTypeEnum::SNAP_PACKET) {}
 		PacketSnapshot(std::vector<glm::vec2> positions) : Packet(packetTypeEnum::SNAP_PACKET), positions_(positions) {}
 
 		const std::vector<glm::vec2>& getPositions() const {return positions_;}
@@ -141,16 +144,28 @@ class PacketSnapshot : public Packet {
 
 			serializeInt32(stream, this->packetType_);
 
-			if(Stream::isReading && (this->packetType_ == packetTypeEnum::SNAP_PACKET)) {
-				throw std::invalid_argument("Not a correct type of packet");
-			}
-			
-			for(const auto& position : positions_) {
-				serializeVec2(stream, position);
+			if(Stream::isReading && (this->packetType_ != packetTypeEnum::SNAP_PACKET)) {
+				throw std::invalid_argument("Not a correct type of packet (Snapshot)");
 			}
 
-			if(Stream::isReading)
+			// if(Stream::isWriting) { //Debugging //This part is correct
+			// 	std::cout << "The size of the snapshot vector during send is: " << positions_.size() << ", expected 2\n";
+			// } 
+			
+			if(Stream::isReading) {
+				positions_.clear();
+				glm::vec2 position;
+				for(int i = 0; i < 2; i++) {
+					serializeVec2(stream, position);
+					positions_.push_back(position);
+				}
 				stream.getBuffer().reset();
+			} else {
+				for(auto& position : positions_) {
+					serializeVec2(stream, position);
+				}
+			}
+
 		}
 };
 
@@ -165,7 +180,7 @@ class PacketHello : public Packet {
 		uint32_t id_;
 	public: 
 
-		PacketHello() : Packet(), id_(0) {}
+		PacketHello() : Packet(packetTypeEnum::HELLO_PACKET), id_(0) {}
 		PacketHello(uint32_t id) : Packet(packetTypeEnum::HELLO_PACKET), id_(id) {}
 
 		uint32_t getId() const {return id_;}
@@ -174,8 +189,8 @@ class PacketHello : public Packet {
 
 			serializeInt32(stream, this->packetType_);
 
-			if(Stream::isReading && (this->packetType_ == packetTypeEnum::HELLO_PACKET)) {
-				throw std::invalid_argument("Not a correct type of packet");
+			if(Stream::isReading && (this->packetType_ != packetTypeEnum::HELLO_PACKET)) {
+				throw std::invalid_argument("Not a correct type of packet (Hello)");
 			}
 			
 			serializeInt32(stream, id_);

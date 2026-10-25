@@ -27,8 +27,8 @@ void Server::connect() {
 	//Handles the two players who MUST connect
 	for(int i = 0; i < 2;) {
 		PacketHello helloPacket;
+		std::cout << "Waiting for player " << i + 1 << std::endl;
 		try {
-
 			sock.receive(&clientAddr, rStream.getBuffer());
 			helloPacket.serializeData(rStream);
 			if(helloPacket.getId() == uint32_t{0})
@@ -40,13 +40,18 @@ void Server::connect() {
 		} catch(std::runtime_error e) {
 			std::cerr<<e.what()<<std::endl;
 		}
+
+		std::cout << "Server received the " << i << ". hello packet with id = " << helloPacket.getId() <<
+								 " and packet type = " << helloPacket.getType() << ", expected 4\n";
 	}
 
 	//Broadcasts the IDs back to all the connected players
 	for(auto& client : clientAddrs) {
+
 		PacketHello startRunningPacket(client.first);
 		startRunningPacket.serializeData(wStream);
-
+		std::cout << "Server sent out a start packet\n";
+		std::cout << startRunningPacket.getType() << "\n";
 		try {
 			sock.send(&client.second, wStream.getBuffer());
 		} catch(std::system_error e) {

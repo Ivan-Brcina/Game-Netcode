@@ -6,8 +6,8 @@
 CubeRenderer::CubeRenderer() {
 	window_ = openGLinit();
   shader_ = std::make_unique<Shader>(
-      "shader.vert",
-      "shader.frag");
+      "Rendering/shader.vert",
+      "Rendering/shader.frag");
 	meshGenerator_.createCube(cubeVAO_, cubeVBO_);
 	meshGenerator_.createPlane(planeVAO_, planeVBO_);
 	shader_->use();
@@ -23,9 +23,9 @@ CubeRenderer::CubeRenderer() {
 }
 
 CubeRenderer::~CubeRenderer() {
-	glDeleteBuffers(1, &planeVAO_);
+	glDeleteVertexArrays(1, &planeVAO_);
 	glDeleteBuffers(1, &planeVBO_);
-	glDeleteBuffers(1, &cubeVAO_);
+	glDeleteVertexArrays(1, &cubeVAO_);
 	glDeleteBuffers(1, &cubeVBO_);
 }
 
@@ -65,6 +65,10 @@ void CubeRenderer::pollEvents() {
 	glfwPollEvents();
 }
 
+GLFWwindow* CubeRenderer::getWindow() const {
+	return window_;
+}
+
 void CubeRenderer::drawFloor() {
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::scale(model, glm::vec3(10.0f));
@@ -95,7 +99,7 @@ void CubeRenderer::drawCubes(const CubeGame& game) {
 
 //Should be the one to call glfwSwapBuffers()
 void CubeRenderer::render(const CubeGame& game) {
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	drawFloor();
 	drawCubes(game);
 	glfwSwapBuffers(window_);

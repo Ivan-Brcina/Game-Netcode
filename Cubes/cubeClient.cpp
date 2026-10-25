@@ -1,5 +1,4 @@
 #include "cubeClient.hpp"
-#include <stdio.h>
 #include <chrono>
 #include <iostream>
 
@@ -20,7 +19,7 @@ Client::Client() : clientAddr(127,0,0,1,0), serverAddr(127,0,0,1,9000) {
 }
 
 void Client::connect() {
-	PacketHello helloPacket{};
+	PacketHello helloPacket;
 	helloPacket.serializeData(wStream);
 
 	try {
@@ -47,7 +46,7 @@ void Client::connect() {
 	helloPacket.serializeData(rStream);
 	playerId_ = helloPacket.getId();
 	sock.setNonBlocking(true);
-	std::cout << "Game can begin" << std::endl;
+	std::cout << "Connection succesful, beginning run()" << std::endl;
 }
 
 void Client::sendInputs() {
@@ -59,7 +58,7 @@ void Client::sendInputs() {
 		inputs[i] = glfwGetKey(window, keys[i]) == GLFW_PRESS;
 	}
 
-	PacketInputs inputPacket{playerId_, inputs};
+	PacketInputs inputPacket{this->playerId_, inputs};
 	inputPacket.serializeData(wStream);
 
 	try {
@@ -96,6 +95,7 @@ void Client::run() {
 		microseconds accumulator(0);
 		bool loop = true;
 
+		std::cout << "Reached the beginning of the main loop\n";
 		while(loop) {
 			auto current = steady_clock::now();
 			accumulator += duration_cast<microseconds>(current - previous);
@@ -106,11 +106,16 @@ void Client::run() {
 
 			while(accumulator >= dt) {
 
+				// std::cout << "Reached the inner network while loop\n";
 				if(receiveSnapshot()) {
-					this->game.applySnapshot(this->snapshot);
+					// std::cout << "Received a snapshot\n";
+					this->game.applySnapshot(this->snapshot); //Bug is here
+					// std::cout << "Applied said snapshot\n";
 				}
 																		 
+				// std::cout << "before sendInputs()\n";
 				sendInputs();
+				// std::cout << "Sent a set of inputs\n";
 				accumulator -= dt;
 			}
 

@@ -20,6 +20,6 @@ class CubeRenderer {
 		CubeRenderer();
 		~CubeRenderer();
 		void pollEvents();
-		GLFWwindow* getWindow();
+		GLFWwindow* getWindow() const;
 		void render(const CubeGame& game);
 };
