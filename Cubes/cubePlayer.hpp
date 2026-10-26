@@ -1,5 +1,6 @@
 #pragma once
 #include <glm/glm.hpp>
+#include <vector>
 
 //Currently there is no plan to use the color_ field. It's there to simply fill up space and simulate
 //a player being something more complex than a position. Might change later
