@@ -1,5 +1,6 @@
 #include "mesh.hpp"
 #include <glm/gtc/type_ptr.hpp>
+#include <vector>
 
 Mesh::Mesh() {}
 
