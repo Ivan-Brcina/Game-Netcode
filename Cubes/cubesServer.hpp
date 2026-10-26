@@ -4,6 +4,7 @@
 #include "cubeGame.hpp"
 
 #include <memory>
+#include <vector>
 #include <unordered_map>
 
 //Currently both serverAddr and clientAddr are loopback addresses on the same port.

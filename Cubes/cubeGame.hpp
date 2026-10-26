@@ -2,6 +2,7 @@
 #include "../Socket-Packet/myPacket.hpp"
 #include "cubePlayer.hpp"
 #include <memory>
+#include <vector>
 
 //I had the additional idea of making a Game superclass that any project can inherit from 
 //so that it always works with Server and Client in tandem.

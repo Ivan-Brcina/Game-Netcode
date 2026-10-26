@@ -4,6 +4,7 @@
 #include "mySerialization.hpp"
 
 #include <iostream> //debugging
+#include <vector>
 
 enum packetTypeEnum {
 	POSITION_PACKET,
