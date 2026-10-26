@@ -30,7 +30,7 @@ class Server {
 		void sendSnapshot();
 
 	public:
-		Server();
+		Server(const char* serverIPv4);
 		~Server() = default;
 
 		void run();

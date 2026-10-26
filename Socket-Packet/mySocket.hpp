@@ -20,6 +20,7 @@ class Address {
 						unsigned char c, 
 						unsigned char d, 
 						unsigned short port);
+		Address(const char* ip, unsigned short port);
 
 		Address(unsigned int address, unsigned short port);
 

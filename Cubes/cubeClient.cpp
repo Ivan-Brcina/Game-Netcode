@@ -7,7 +7,7 @@ using namespace std::chrono;
 //Setting the port to 0 will 
 //choose a random free port while keeping
 //the desired ip address.
-Client::Client() : clientAddr(127,0,0,1,0), serverAddr(127,0,0,1,9000) { 
+Client::Client(const char* clientIPv4, const char* serverIPv4) : clientAddr(clientIPv4, 0), serverAddr(serverIPv4,9000) { 
 	try {
 		sock.open();
 		sock.bind(clientAddr);
@@ -125,7 +125,12 @@ void Client::run() {
 
 int main(int argc, char** argv) {
 
-	Client client{};
+	if(argc != 3) {
+		std::cout << "Usage: cubeClient (clientIp serverIp): 192.168.1.10 192.168.1.20\n";
+	}
+	std::string clientIp{argv[1]};
+	std::string serverIp{argv[2]};
+	Client client{clientIp.c_str(), serverIp.c_str()};
 	client.run();
 
 }

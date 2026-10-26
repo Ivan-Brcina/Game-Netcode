@@ -7,7 +7,7 @@
 
 using namespace std::chrono;
 
-Server::Server() : serverAddr(127,0,0,1,9000) {
+Server::Server(const char* serverIPv4) : serverAddr(serverIPv4, 9000) {
 	try {
 		sock.open();
 		sock.bind(serverAddr);
@@ -155,8 +155,13 @@ void Server::run() {
 		}
 }
 
-int main() {
+int main(int argc, char** argv) {
 	
-	Server server{};
+	if (argc != 2) {
+		std::cout << "Usage: cubesServer 192.168.1.90\n";
+		return 0;
+	}
+	std::string ipAddress{argv[1]};
+	Server server{ipAddress.c_str()};
 	server.run();
 }

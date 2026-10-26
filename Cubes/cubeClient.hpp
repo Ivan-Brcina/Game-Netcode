@@ -22,7 +22,7 @@ class Client {
 		bool receiveSnapshot();
 		void sendInputs();
 	public:
-		Client();
+		Client(const char* clientIPv4, const char* serverIPv4);
 		~Client() = default;
 
 		void run();

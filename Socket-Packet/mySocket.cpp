@@ -3,6 +3,7 @@
 #include <system_error>
 #include <errno.h>
 #include <fcntl.h>
+#include <arpa/inet.h>
 
 Address::Address(unsigned char a, 
 				unsigned char b, 
@@ -13,6 +14,17 @@ Address::Address(unsigned char a,
 	int ipAddr = (a << 24) | (b  << 16) | (c << 8) | d;
 	address_.sin_family = AF_INET;
 	address_.sin_addr.s_addr = htonl(ipAddr);
+	address_.sin_port = htons(port);
+}
+
+Address::Address(const char* ip, unsigned short port) {
+	int status = inet_pton(AF_INET, ip, &address_.sin_addr);
+	if (status == 0) 
+		throw std::runtime_error("Not a valid address string\n");
+	if(status < 0)
+		throw std::system_error();
+
+	address_.sin_family = AF_INET;
 	address_.sin_port = htons(port);
 }
 
