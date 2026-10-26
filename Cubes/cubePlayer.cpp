@@ -5,7 +5,7 @@
 //Currently fixed to move the unit amount per second since the updatePosition should happen at 60fps.
 void Player::updatePosition(std::vector<bool>& inputs) {
 	float deltaTime = 1.0f / 60.0f;
-	float unit = 1.0f;
+	float unit = 3.0f;
 	float deltaS = unit * deltaTime;
 
 	if(inputs[0]) 
