@@ -2,16 +2,16 @@
 #include <iostream>
 #include <queue>
 
-void CubeGame::step(std::vector<std::queue<std::unique_ptr<PacketInputs>>>& queues) {
+void CubeGame::step(std::vector<std::queue<PacketInputs>>& queues) {
 
 	for(int i = 0; i < queues.size(); i++) {
 
 		if(!queues.at(i).empty()) {
 
-			std::unique_ptr<PacketInputs>& packet = queues.at(i).front();
-			std::vector<bool> inputs = packet->getInputs();
+			PacketInputs& packet = queues.at(i).front();
+			std::vector<bool> inputs = packet.getInputs();
 
-			switch((int)packet->getId()) {
+			switch((int)packet.getId()) {
 				case 1:
 					p1.updatePosition(inputs);
 					break;

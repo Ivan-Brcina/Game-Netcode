@@ -17,7 +17,7 @@ class CubeGame {
 								 p2(glm::vec2( 5.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f)) {}
 		~CubeGame() = default;
 
-		void step(std::vector<std::queue<std::unique_ptr<PacketInputs>>>& queues); //To be used by the server
+		void step(std::vector<std::queue<PacketInputs>>& queues); //To be used by the server
 		void applySnapshot(const PacketSnapshot& snapshot);
 
 		//Should this be copied or can it be any other way?

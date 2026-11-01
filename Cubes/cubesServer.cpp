@@ -184,7 +184,7 @@ void Server::run() {
 			while(currentTime >= accumulator) {
 
 				if (readInputs())
-					game.step(this->inputPackets);
+					game.step(this->inputQueues);
 
 				sendSnapshot();
 				accumulator += dt;
