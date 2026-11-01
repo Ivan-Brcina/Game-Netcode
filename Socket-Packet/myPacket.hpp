@@ -100,6 +100,7 @@ class PacketInputs : public Packet {
 		bool inputs_[4];
 	public:
 		PacketInputs() : Packet(packetTypeEnum::INPUT_PACKET) {}
+		PacketInputs(const PacketInputs& other) = default;
 		PacketInputs(PacketInputs&& other) = default;
 
 		PacketInputs(uint32_t id, bool inputs[4]) : Packet(packetTypeEnum::INPUT_PACKET), id_(id) {

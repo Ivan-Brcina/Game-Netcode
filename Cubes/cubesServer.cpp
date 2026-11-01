@@ -21,6 +21,7 @@ Server::Server(const char* serverIPv4) : serverAddr(serverIPv4, 9000) {
 //Waits for both players, expects two PacketHellos, writes down who they came from, stores them in a std::unordered_map,
 //sends back the helloPacket with each players id attached, telling them to start running. Then starts run{)-ning()
 //The unordered_map starts indexing from 1.
+
 void Server::connect() {
 	Address clientAddr;
 
@@ -38,10 +39,14 @@ void Server::connect() {
 			} else {
 				throw std::runtime_error("Server received a non 0 id on connect()\n");
 			}
+
 		} catch(std::system_error e) {
 			std::cerr<<e.what()<<std::endl;
 		} catch(std::runtime_error e) {
 			std::cerr<<e.what()<<std::endl;
+		} catch(std::invalid_argument e) {
+			std::cout<<e.what()<<std::endl;
+			continue;
 		}
 
 		std::cout << "Server received the " << i << ". hello packet with id = " << helloPacket.getId() <<
@@ -100,7 +105,7 @@ bool Server::readInputs() {
 		PacketInputs packet{};
 		packet.serializeData(rStream);
 		//If a packet arrived from an unregistered address or with an invalid id,
-		//resets the readStream buffer and reads again
+		//resets the readStream buffer and reads again (possibly should instead exit the loop)
 		if(!isValidPacket(packet, clientAddr)) {
 			rStream.getBuffer().reset();
 			continue;

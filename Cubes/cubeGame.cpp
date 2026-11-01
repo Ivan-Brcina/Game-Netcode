@@ -2,6 +2,8 @@
 #include <iostream>
 #include <queue>
 
+//Should possibly be able to apply the previously applied input in case the queue is empty at least once.
+//Not sure why that's useful 
 void CubeGame::step(std::vector<std::queue<PacketInputs>>& queues) {
 
 	for(int i = 0; i < queues.size(); i++) {
