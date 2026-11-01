@@ -3,6 +3,7 @@
 #include "cubePlayer.hpp"
 #include <memory>
 #include <vector>
+#include <queue>
 
 //I had the additional idea of making a Game superclass that any project can inherit from 
 //so that it always works with Server and Client in tandem.
@@ -16,7 +17,7 @@ class CubeGame {
 								 p2(glm::vec2( 5.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f)) {}
 		~CubeGame() = default;
 
-		void simulate(std::vector<std::unique_ptr<PacketInputs>>& inputPackets); //To be used by the server
+		void step(std::vector<std::queue<std::unique_ptr<PacketInputs>>>& queues); //To be used by the server
 		void applySnapshot(const PacketSnapshot& snapshot);
 
 		//Should this be copied or can it be any other way?

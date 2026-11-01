@@ -1,21 +1,29 @@
 #include "cubeGame.hpp"
 #include <iostream>
+#include <queue>
 
-void CubeGame::simulate(std::vector<std::unique_ptr<PacketInputs>>& inputPackets) {
+void CubeGame::step(std::vector<std::queue<std::unique_ptr<PacketInputs>>>& queues) {
 
-	for(std::unique_ptr<PacketInputs>& packet : inputPackets) {
-		std::vector<bool> inputs = packet->getInputs();
-		switch((int)packet->getId()) {
-			case 1:
-				p1.updatePosition(inputs);
-				break;
-			case 2:
-				p2.updatePosition(inputs);
-				break;
-			default:
-				std::cout << "The server is reading an invalid player id during simulation\nIt reads"
-									<< packet->getId() << ", expected either 1 or 2";
-				break;
+	for(int i = 0; i < queues.size(); i++) {
+
+		if(!queues.at(i).empty()) {
+
+			std::unique_ptr<PacketInputs>& packet = queues.at(i).front();
+			std::vector<bool> inputs = packet->getInputs();
+
+			switch((int)packet->getId()) {
+				case 1:
+					p1.updatePosition(inputs);
+					break;
+				case 2:
+					p2.updatePosition(inputs);
+					break;
+				default:
+					std::cout << "Somehow an invalid playerId reached the step() function\n";
+					break;
+				}
+
+				queues.at(i).pop();
 		}
 	}
 }

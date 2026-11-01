@@ -31,10 +31,13 @@ void Server::connect() {
 		try {
 			sock.receive(&clientAddr, rStream.getBuffer());
 			helloPacket.serializeData(rStream);
-			if(helloPacket.getId() == uint32_t{0})
-				clientAddrs.emplace(++i,clientAddr);
-			else throw std::runtime_error("Server received a non 0 id on connect()\n");
 
+			if(helloPacket.getId() == uint32_t{0}) {
+				clientAddrs.emplace(++i,clientAddr);
+				inputQueues.push_back(std::queue<PacketInputs>{});
+			} else {
+				throw std::runtime_error("Server received a non 0 id on connect()\n");
+			}
 		} catch(std::system_error e) {
 			std::cerr<<e.what()<<std::endl;
 		} catch(std::runtime_error e) {
@@ -44,7 +47,6 @@ void Server::connect() {
 		std::cout << "Server received the " << i << ". hello packet with id = " << helloPacket.getId() <<
 								 " and packet type = " << helloPacket.getType() << ", expected 4\n";
 	}
-
 	//Broadcasts the IDs back to all the connected players
 	for(auto& client : clientAddrs) {
 
@@ -61,7 +63,6 @@ void Server::connect() {
 		}
 
 	}
-
 	sock.setNonBlocking(true);
 	std::cout << "Server running...\n";
 }
@@ -83,24 +84,57 @@ void Server::connect() {
 //Returns false if there was nothing to read for the entire time the function is running. True otherwise
 bool Server::readInputs() {
 	bool filled = false;
-	inputPackets.clear();
 
 	while(true) { 
 
+		Address clientAddr;
+
 		try {
-			sock.receive(nullptr, rStream.getBuffer());
+			sock.receive(&clientAddr, rStream.getBuffer());
 		} catch(std::system_error e) {
 			std::cerr<<e.what()<<std::endl;
 		} catch (bool wouldBlock) { //If there is nothing else to read, break
 			break;
 		}
 
-		filled = true;
 		PacketInputs packet{};
 		packet.serializeData(rStream);
-		this->inputPackets.push_back(std::make_unique<PacketInputs>(std::move(packet))); //No idea if this works
+		//If a packet arrived from an unregistered address or with an invalid id,
+		//resets the readStream buffer and reads again
+		if(!isValidPacket(packet, clientAddr)) {
+			rStream.getBuffer().reset();
+			continue;
+		}
+
+		filled = true;
+		dispatchPacket(packet);
 	}
 	return filled;
+}
+
+//Fowards a freshly received input packet into the appropriate input queue
+//
+//At the point when this function is called, the packet itself as well as its
+//sender should already be validated when received. This means that there should
+//always be an adequate queue that exists. Also if the queue size is greater than 10,
+//in order to avoid further congestion, the older packets are dropped in favor of new ones.
+void Server::dispatchPacket(const PacketInputs& packet) {
+	std::queue<PacketInputs>& currentQueue = inputQueues.at(packet.getId()-1);
+	if(currentQueue.size() >= 10) {
+		currentQueue.pop();
+	}
+	currentQueue.push(packet);
+}
+
+
+//Checks if the received packet came from a registered client address and if the player id
+//is valid for that address.
+bool Server::isValidPacket(const PacketInputs& packet, const Address& clientAddr) const {
+	for(const auto& addrPair : clientAddrs) {
+		if(addrPair.second == clientAddr && addrPair.first == packet.getId())
+			return true;
+	}
+	return false;
 }
 
 //Takes the player states, packs them into a snapshot packet and sends that to loopback again.
@@ -136,6 +170,9 @@ void Server::sendSnapshot() {
 
 //Should I send snapshots only when the game state changes or literally always?
 //For now it'll be always
+
+//Should add a queue system for the inputs.
+//
 void Server::run() {
     time_point<steady_clock> start = steady_clock::now();
 		auto dt = microseconds(16667); // 60fps
@@ -147,13 +184,14 @@ void Server::run() {
 			while(currentTime >= accumulator) {
 
 				if (readInputs())
-					game.simulate(this->inputPackets);
+					game.step(this->inputPackets);
 
 				sendSnapshot();
 				accumulator += dt;
 			}
 		}
 }
+
 
 int main(int argc, char** argv) {
 	

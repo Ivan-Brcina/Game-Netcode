@@ -4,7 +4,8 @@
 #include "cubeGame.hpp"
 
 #include <memory>
-#include <vector>
+#include <queue>
+
 #include <unordered_map>
 
 //Currently both serverAddr and clientAddr are loopback addresses on the same port.
@@ -22,13 +23,15 @@ class Server {
 
 		WriteStream wStream;
 		ReadStream rStream;
-		std::vector<std::unique_ptr<PacketInputs>> inputPackets;
+		std::vector<std::queue<PacketInputs>> inputQueues;
 
 		CubeGame game; //Change this to change the game logic handling
 
 		void connect();
 		bool readInputs();
+		void dispatchPacket(const PacketInputs& packet);
 		void sendSnapshot();
+		bool isValidPacket(const PacketInputs& packet, const Address& clientAddr) const;
 
 	public:
 		Server(const char* serverIPv4);

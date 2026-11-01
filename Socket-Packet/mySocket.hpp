@@ -24,7 +24,7 @@ class Address {
 
 		Address(unsigned int address, unsigned short port);
 
-		bool operator==(const Address& other) {
+		bool operator==(const Address& other) const {
 			if((address_.sin_addr.s_addr == other.address_.sin_addr.s_addr) &&
 				(address_.sin_port == other.address_.sin_port))
 				return true;
