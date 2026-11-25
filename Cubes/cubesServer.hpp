@@ -3,14 +3,10 @@
 #include "../Socket-Packet/myPacket.hpp"
 #include "cubeGame.hpp"
 
-#include <memory>
 #include <queue>
 
 #include <unordered_map>
 
-//Currently both serverAddr and clientAddr are loopback addresses on the same port.
-//
-//
 //Might later think about how to make Server to be a reusable library utility with 
 //the options to overload functions like simulate(), while read() and write() and so on
 //remain the same or something.
